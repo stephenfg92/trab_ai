@@ -10,6 +10,7 @@ from sklearn.utils import class_weight
 from sklearn.model_selection import train_test_split
 
 MODEL_EXPORT_PATH = 'trained_model/'
+FIG_NAME = 'resultado_treinamento'
 
 # passo 0
 def le_arquivo(nome_arq):
@@ -36,8 +37,6 @@ num_padroes, num_atrib = ct.shape
 X = ct[:, 0:num_atrib - 1]
 Y = ct[:, num_atrib - 1:num_atrib]
 
-# Stratify é amostragem estratificada. É um conceito de estatística usado quando os dados estão desbalanceados.
-# Aqui, por exemplo, temos muitos dados onde attack == 1, versus 477 de attack == 0.
 XTraining, XValidation, YTraining, YValidation = train_test_split(X,Y,stratify=Y,test_size=0.1) # before model building
 
 n0 = 200
@@ -56,8 +55,6 @@ optimizer = keras.optimizers.Adam(learning_rate=lr, decay=lr / ts)
 
 model.compile(loss="binary_crossentropy", optimizer=optimizer, metrics=["accuracy"])
 
-# class_weights = class_weight.compute_class_weight('balanced', np.unique(y), y)
-
 history = model.fit(XTraining, YTraining, epochs=ts, validation_data=(XValidation,YValidation), shuffle=True)
 
 model.save(MODEL_EXPORT_PATH)
@@ -65,7 +62,7 @@ model.save(MODEL_EXPORT_PATH)
 pd.DataFrame(history.history).plot(figsize=(8, 5))
 plt.grid(True)
 plt.gca().set_ylim(0, 2)
-plt.show()
+plt.savefig(FIG_NAME)
 
 x_new = X[1:2, :]
 
